@@ -1,8 +1,10 @@
 import re
 import logging
+from os.path import join
 
 class SongFile:
-    def __init__(self, file, filename):
+    def __init__(self, file, filename, dir):
+        self.dir = dir
         self.textfile = file
         self.filename = filename
         self.duetsingers = []
@@ -13,6 +15,16 @@ class SongFile:
         while (line and line != "E"):
             self.parse_line(line)
             line = self.next_line()
+        if not self.is_duet:
+            del self.duetsingers
+
+    def load_cover(self):
+        with open(join(self.dir, self.cover_path), mode='rb') as f:
+            return f.read()
+
+    def load_bg(self):
+        with open(join(self.dir, self.background_path), mode='rb') as f:
+            return f.read()
 
     def parse_line(self, line):
         if line[0] == "#":
