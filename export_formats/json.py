@@ -23,6 +23,7 @@ def export_song(args, song):
         d.pop("video_path", None)
         d.pop("background_path", None)
         d.pop("mp3file", None)
+        d.pop("dir", None)
     if args.covers:
         try:
             d["cover"] = base64.b64encode(song.load_cover()).decode("utf-8")

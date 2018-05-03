@@ -63,6 +63,8 @@ class SongFile:
                 self.year = int(val)
             elif com == "CREATOR":
                 self.creator = val
+            elif com == "SOURCE":
+                self.source = val
             elif re.match(r'DUETSINGER\d+', com):
                 singer_no = re.match(r'DUETSINGER(\d+)', com).group(1)
                 self.duetsingers[int(singer_no)] = val
