@@ -45,14 +45,19 @@ def create_song_dict(args, song):
         d.pop("video_path", None)
         d.pop("background_path", None)
         d.pop("mp3file", None)
+        d.pop("dir", None)
     if args.covers:
         try:
             d["cover"] = song.load_cover()
+        except AttributeError:
+            logging.info("Song " + song.title + " is does not have cover included.")
         except Exception as e:
-            logging.warning("failed to load cover with error " + str(e))
+            logging.warning("failed to load cover for " + song.title + " with error " + str(e))
     if args.bgs:
         try:
             d["bg"] = song.load_bg()
-        except:
-            logging.warning("failed to load background with error " + str(e))
+        except AttributeError:
+            logging.info("Song " + song.title + " is does not have background included.")
+        except Exception as e:
+            logging.warning("failed to load background for " + song.title + " with error " + str(e))
     return d

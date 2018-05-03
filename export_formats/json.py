@@ -26,11 +26,15 @@ def export_song(args, song):
     if args.covers:
         try:
             d["cover"] = base64.b64encode(song.load_cover()).decode("utf-8")
+        except AttributeError:
+            logging.info("Song " + song.title + " is does not have cover included.")
         except Exception as e:
-            logging.warning("failed to load cover with error " + str(e))
+            logging.warning("failed to load cover for " + song.title + " with error " + str(e))
     if args.bgs:
         try:
             d["bg"] = base64.b64encode(song.load_bg()).decode("utf-8")
-        except:
-            logging.warning("failed to load background with error " + str(e))
+        except AttributeError:
+            logging.info("Song " + song.title + " is does not have background included.")
+        except Exception as e:
+            logging.warning("failed to load background for " + song.title + " with error " + str(e))
     return d
