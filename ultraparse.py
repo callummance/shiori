@@ -17,6 +17,11 @@ class SongFile:
             line = self.next_line()
         if not self.is_duet:
             del self.duetsingers
+        if not (hasattr(self, "title") and hasattr(self, "artist")):
+            logging.error("File " + self.filename + " is missing essential data. Ignoring...")
+            return False
+        else:
+            return True
 
     def load_cover(self):
         with open(join(self.dir, self.cover_path), mode='rb') as f:

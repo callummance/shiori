@@ -1,4 +1,4 @@
-#!/bin/python3
+#!python3
 
 from os import listdir
 from os.path import isfile, isdir, join, splitext
@@ -32,6 +32,8 @@ class LibraryManager:
                 else:
                     logging.info("Found likely ultrastar file in directory " + directory)
                     self.parse_songfile(join(directory, txtfiles[0]), directory)
+            else:
+                logging.debug("Rejecting directory " + directory)
         else:
             #If there are subdirectories, search them
             for subdir in subdirs:
@@ -39,7 +41,7 @@ class LibraryManager:
 
     def is_songdir(self, filenames):
         #All valid songs should have an audio file and a text file
-        extensions = map(lambda n: splitext(n)[1], filenames)
+        extensions = list(map(lambda n: splitext(n)[1], filenames))
         return (".mp3" in extensions or ".ogg" in extensions or ".aac" in extensions) and (".txt" in extensions)
 
     def parse_songfile(self, filename, dir):
@@ -51,16 +53,19 @@ class LibraryManager:
                 pass
             f.seek(0)
             song_data = ultraparse.SongFile(iter(f.readlines()), filename, dir)
-            song_data.parse()
-            self.library.append(song_data)
+            if song_data.parse():
+                self.library.append(song_data)
             f.close()
         except UnicodeDecodeError:
             #Apparently not, just let python take a guess
-            f = open(filename, encoding=None, errors="strict")
-            song_data = ultraparse.SongFile(iter(f.readlines()), filename, dir)
-            song_data.parse()
-            self.library.append(song_data)
-            f.close()
+            try:
+                f = open(filename, encoding=None, errors="strict")
+                song_data = ultraparse.SongFile(iter(f.readlines()), filename, dir)
+                if song_data.parse():
+                    self.library.append(song_data)
+                f.close()
+            except UnicodeDecodeError as e:
+                logging.error("well balls, apparently the encoding is wonky in file " + filename + "; " + str(e))
         except Exception as e:
             logging.warn("Encountered unexpected error parsing file " + filename + ": " + str(e))
 
@@ -84,6 +89,7 @@ def run_scan():
     backend = importlib.import_module("export_formats." + args.store)
     lib = LibraryManager(args.dir)
     lib.scan()
+    print ("Found " + str(len(lib.library)) + " results. Now exporting...")
     backend.export(args, parse_opts(args.opts), lib)
 
 def parse_opts(option_string):
