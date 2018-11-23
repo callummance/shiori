@@ -65,7 +65,7 @@ class LibraryManager:
         except UnicodeDecodeError:
             #Apparently not, just let python take a guess
             try:
-                f = open(filename, encoding=None, errors="strict")
+                f = open(filename, encoding=None, errors="replace")
                 song_data = ultraparse.SongFile(iter(f.readlines()), filename, dir)
                 if song_data.parse():
                     self.library.append(song_data)
