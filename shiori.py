@@ -6,6 +6,7 @@ import logging
 import codecs
 import argparse
 import importlib
+import sys
 
 import ultraparse
 
@@ -33,7 +34,7 @@ class LibraryManager:
                     logging.info("Found likely ultrastar file in directory " + directory)
                     self.parse_songfile(join(directory, txtfiles[0]), directory)
             else:
-                logging.debug("Rejecting directory " + directory)
+                logging.warning("Rejecting directory " + directory + "\nThis rejection is sometimes a false positive. I suggest running it again on this file.")
         else:
             #If there are subdirectories, search them
             for subdir in subdirs:
@@ -41,16 +42,21 @@ class LibraryManager:
 
     def is_songdir(self, filenames):
         #All valid songs should have an audio file and a text file
-        extensions = list(map(lambda n: splitext(n)[1], filenames))
-        return (".mp3" in extensions or ".ogg" in extensions or ".aac" in extensions) and (".txt" in extensions)
+        extensions = list(map(lambda n: (splitext(n)[1]).upper(), filenames))
+        if (not (".mp3".upper() in extensions or ".ogg".upper() in extensions or ".aac".upper() in extensions) and 
+            not (".mp4".upper() in extensions or ".avi" in extensions)):
+            logging.error("No sound or video file found for the following directory!")
+            return False
+        if (not ".txt".upper() in extensions):
+            logging.error("No txt file found for the following directory!")
+            return False
+        return True
 
     def parse_songfile(self, filename, dir):
         logging.info("Now parsing file" + filename)
         try:
             #Is it UTF-8?
             f = open(filename, encoding="utf-8-sig", errors="strict")
-            for line in f:
-                pass
             f.seek(0)
             song_data = ultraparse.SongFile(iter(f.readlines()), filename, dir)
             if song_data.parse():
@@ -67,7 +73,8 @@ class LibraryManager:
             except UnicodeDecodeError as e:
                 logging.error("well balls, apparently the encoding is wonky in file " + filename + "; " + str(e))
         except Exception as e:
-            logging.warn("Encountered unexpected error parsing file " + filename + ": " + str(e))
+            logging.error("Encountered unexpected error parsing file " + filename + ":\n")
+            logging.exception(e)
 
 def run_scan():
     parser = argparse.ArgumentParser(description = "Scan directory for ultrastar songs, then export them in a given format")
@@ -100,5 +107,29 @@ def parse_opts(option_string):
         opts_dict[key] = value
     return opts_dict
 
+class LessThanFilter(logging.Filter):
+    def __init__(self, exclusive_maximum, name=""):
+        super(LessThanFilter, self).__init__(name)
+        self.max_level = exclusive_maximum
+
+    def filter(self, record):
+        #non-zero return means we log this message
+        return 1 if record.levelno < self.max_level else 0
+
 if __name__ == "__main__":
+    #Get the root logger
+    logger = logging.getLogger()
+    #Have to set the root logger level, it defaults to logging.WARNING
+    logger.setLevel(logging.NOTSET)
+
+    logging_handler_out = logging.StreamHandler(sys.stdout)
+    logging_handler_out.setLevel(logging.DEBUG)
+    logging_handler_out.addFilter(LessThanFilter(logging.WARNING))
+    logger.addHandler(logging_handler_out)
+
+    # Uncomment to print it out to stderr
+    # logging_handler_err = logging.StreamHandler(sys.stderr)
+    logging_handler_err = logging.FileHandler('shiori_error.log', 'w', 'utf-8')
+    logging_handler_err.setLevel(logging.WARNING)
+    logger.addHandler(logging_handler_err)
     run_scan()

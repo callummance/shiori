@@ -33,7 +33,13 @@ class SongFile:
 
     def parse_line(self, line):
         if line[0] == "#":
-            [com, val] = line.split(':', 1)
+            try:
+                [com, val] = line.split(':', 1)
+            except ValueError:
+                # Badly formatted line. We shall skip
+                line = self.next_line()
+                self.parse_line(line)
+                return
             com = str.strip(com[1:]).upper()
             val = str.strip(val)
             #Metadata tag
