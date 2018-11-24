@@ -7,9 +7,11 @@ def export(args, opts, library):
         logging.error("Please include `--export-opts \"mongo_uri=mongodb://<addr>:<port>,mongo_db=<db_name>,mongo_collection=<collection_name>\"`")
         return
     else:
+        print("Mongo uri = %s" % opts["mongo_uri"])
         client = pymongo.MongoClient(opts["mongo_uri"])
         collection = client[opts["mongo_db"]][opts["mongo_collection"]]
         for song in library.library:
+            logging.info("Attempting to export song: %s - %s" % (song.title, song.artist))
             export_song(args, collection, opts, song)
 
 def export_song(args, c, opts, song):
@@ -50,14 +52,14 @@ def create_song_dict(args, song):
         try:
             d["cover"] = song.load_cover()
         except AttributeError:
-            logging.info("Song " + song.title + " is does not have cover included.")
+            logging.warning("Song " + song.title + " is does not have cover included.")
         except Exception as e:
             logging.warning("failed to load cover for " + song.title + " with error " + str(e))
     if args.bgs:
         try:
             d["bg"] = song.load_bg()
         except AttributeError:
-            logging.info("Song " + song.title + " is does not have background included.")
+            logging.warning("Song " + song.title + " is does not have background included.")
         except Exception as e:
             logging.warning("failed to load background for " + song.title + " with error " + str(e))
     return d
