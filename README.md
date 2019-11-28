@@ -1,5 +1,7 @@
 # shiori
 
+*Note: this script is written for python3.*
+
 Example Usage to send to a MongoDB backend:
 ```bash
 python ./shiori/shiori.py --load-covers --export-opts "mongo_uri=mongodb://<username>:<password>@qwerwrt-shard-00-00-b5hdc.mongodb.net:27017/test?ssl=true&replicaSet=qwetewq-shard-0&authSource=admin,mongo_db=wqerweq,mongo_collection=werweq" ./Songs mongo

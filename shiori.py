@@ -117,6 +117,10 @@ class LessThanFilter(logging.Filter):
         return 1 if record.levelno < self.max_level else 0
 
 if __name__ == "__main__":
+    #Check python version
+    if sys.version_info < (3, 0):
+        print("This script is written for python 3. Now exiting...")
+        exit()
     #Get the root logger
     logger = logging.getLogger()
     #Have to set the root logger level, it defaults to logging.WARNING
