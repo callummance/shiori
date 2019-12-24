@@ -11,7 +11,7 @@ Any errors found during the scraping process is outputted to a log file.
 ### Using the `docker-compose` version of azunyan
 Note that if you are using the `docker-compose` version of azunyan you will need to first create an SSH tunnel into the docker network with the command
 ```bash
-ssh -o StrictHostKeyChecking=no -p 2222 -L 27017:database:27017 linuxserver.io@<server_address>
+ssh -o StrictHostKeyChecking=no -p 2222 -L 27017:database:27017 azunyan@<server_address>
 ```
 you can then run Shiori as above with the command
 ```bash
