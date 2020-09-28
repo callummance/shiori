@@ -4,7 +4,7 @@
 
 Example Usage to send to a MongoDB backend:
 ```bash
-python ./shiori/shiori.py --load-covers --export-opts "mongo_uri=mongodb://<username>:<password>@qwerwrt-shard-00-00-b5hdc.mongodb.net:27017/test?ssl=true&replicaSet=qwetewq-shard-0&authSource=admin,mongo_db=azunyan,mongo_collection=songs,status_collection=status" ./Songs mongo
+python ./shiori/shiori.py --load-covers --export-opts "mongo_uri=mongodb://<username>:<password>@qwerwrt-shard-00-00-b5hdc.mongodb.net:27017/test?ssl=true&replicaSet=qwetewq-shard-0&authSource=admin,mongo_db=azunyan,songs_collection=songs,status_collection=status" ./Songs mongo
 ```
 Any errors found during the scraping process is outputted to a log file.
 
@@ -15,7 +15,7 @@ ssh -o StrictHostKeyChecking=no -p 2222 -L 27017:database:27017 azunyan@<server_
 ```
 you can then run Shiori as above with the command
 ```bash
-python ./shiori/shiori.py --load-covers --export-opts "mongo_uri=mongodb://localhost:27017,mongo_db=azunyan,mongo_collection=songs,status_collection=status" ./Songs mongo
+python ./shiori/shiori.py --load-covers --export-opts "mongo_uri=mongodb://localhost:27017,mongo_db=azunyan,songs_collection=songs,status_collection=status" ./Songs mongo
 ```
 
 ### Using Powershell on Windows

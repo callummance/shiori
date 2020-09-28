@@ -5,7 +5,7 @@ import logging
 Available options:
  - mongo_uri(required): uri of the target mongo database
  - mongo_db(required): name of the db within the target mongo instance to be used 
- - mongo_collection(optional): name of the collection to be used for storing songs; defaults to `songs` if none provided
+ - songs_collection(optional): name of the collection to be used for storing songs; defaults to `songs` if none provided
  - status_collection(optional): name of the collection containing records whose `songslastupdated` fields should be updated with the current timestamp; update will
                                not take place if not provided.
 """
@@ -23,7 +23,7 @@ def export(args, opts, library):
         # Connect to db
         client = pymongo.MongoClient(opts["mongo_uri"])
         db = client[opts["mongo_db"]]
-        collection_name = opts["mongo_collection"] if "mongo_collection" in opts else "songs"
+        collection_name = opts["songs_collection"] if "songs_collection" in opts else "songs"
         collection = db[collection_name]
         # Export songs to db
         for song in library.library:
