@@ -2,6 +2,7 @@ import re
 import logging
 from os.path import join
 
+
 class SongFile:
     def __init__(self, file, filename, dir):
         self.dir = dir
@@ -18,7 +19,8 @@ class SongFile:
         if not self.is_duet:
             del self.duetsingers
         if not (hasattr(self, "title") and hasattr(self, "artist")):
-            logging.error("File " + self.filename + " is missing essential data. Ignoring...")
+            logging.error(
+                f"File {self.filename} is missing essential data. Ignoring...")
             return False
         else:
             return True
@@ -37,12 +39,12 @@ class SongFile:
                 [com, val] = line.split(':', 1)
             except ValueError:
                 # Badly formatted line. We shall skip
-                line = self.next_line()
-                self.parse_line(line)
+                logging.warning(
+                    f"Parsing failed on badly formatted line {line}. Ignoring...")
                 return
             com = str.strip(com[1:]).upper()
             val = str.strip(val)
-            #Metadata tag
+            # Metadata tag
             if com == "TITLE":
                 self.title = val
             elif com == "ARTIST":
@@ -78,30 +80,31 @@ class SongFile:
         elif line[0] == "P":
             [_, no] = line.split(" ")
             part_data = []
-            #The actual lyric data will follow, discard this for now
+            # The actual lyric data will follow, discard this for now
             line = self.next_line()
             while line and line[0] != "P" and line[0] != "E":
                 part_data.append(line)
                 line = self.next_line()
-            #Recurse for the next section
+            # Recurse for the next section
             self.parse_line(line)
         elif line[0] == ":" or line[0] == "-" or line[0] == "*" or line[0] == "F":
-            #This is a standard lyrics line
+            # This is a standard lyrics line
             part_data = []
             while line and line[0] != "P" and line[0] != "E":
                 part_data.append(line)
                 line = self.next_line()
-            #Recurse for the next section
+            # Recurse for the next section
             self.parse_line(line)
         elif str.strip(line) == "E":
             #File is finished
             return
         elif not line.rstrip("\n\r\0 "):
-            #Empty line
+            # Empty line
             return
         else:
-            logging.warning("Error in file " + self.filename)
-            logging.warning("Unexpected character found at the start of the following line: '" + str.strip(line) + ". Ignoring line and continuing...")
+            logging.warning(f"Error in file {self.filename}")
+            logging.warning(
+                f"Unexpected character found at the start of the following line: '{str.strip(line)}'. Ignoring line and continuing...")
 
     def next_line(self):
         try:
